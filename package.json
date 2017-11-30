@@ -1,0 +1,14 @@
+{
+  "name": "urlshortener",
+  "version": "1.0.0",
+  "description": "URL Shortener - 3rd FCC API project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Daniel Meilleur",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2"
+  }
+}
