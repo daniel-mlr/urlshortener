@@ -1,3 +1,21 @@
-.gr__localhost {
-  /* background-color: yellow;*/
+.code-container {
+    margin-bottom: 20px;
+}
+.ajout {display: block}
+ol {
+    counter-reset: list;
+    /*background-color: yellow;*/
+}
+ol > li {
+    list-style: none;
+    position: relative;
+    padding: 1px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+ol > li:before {
+    content: counter(list) ") ";
+    counter-increment: list;
+    position: absolute;
+    left: -1.43em;
 }

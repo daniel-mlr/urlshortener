@@ -5,23 +5,34 @@
     <title>FCC URL Shortenre</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="insert content">
-    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
   </head>
   <body>
     <header>
       <h1><small>FreeCodeCamp APi Basejump</small> URL Shortener</h1>
-      <p>This is part of the requirements for the <a href="http://www.freecodecamp.org">Free Code Camp</a> Backend Development Certificate</p>
     </header>
+    <img class="img-responsive" 
+    src="http://res.cloudinary.com/danielmeilleurimg/fcc_backend/etau.png" alt="vice crashing url">
     <div>
-      <h4>User stories:</h4>
-      <li>I can pass a URL as a parameter and I will receive a shortened URL in the JSON response.</li>
-      <li>If I pass an invalid URL that doesn't follow the valid http://www.example.com format, the JSON response will contain an error instead.</li>
-      <li>When I visit that shortened URL, it will redirect me to my original link.</li>
+        <form>
+        </form>
+        Enter URL to shorten
+        <input type="text" name="url_to_shorten">
+        <br>
     </div>
     <div>
-      Enter URL to shorten
       <button type="button">Enter</button>
+      <strong>Note:</strong> You can also enter the URL to shorten in the address bar as follow: {{ req.hostname }}/new/http://address.com
+    </div>
     <div>
+      <p>This is part of the requirements for the <a href="http://www.freecodecamp.org">Free Code Camp</a> Backend Development Certificate</p>
+      <h4>User stories:</h4>
+      <ol>
+          <li>I can pass a URL as a parameter and I will receive a shortened URL in the JSON response.</li>
+          <li>If I pass an invalid URL that doesn't follow the valid http://www.example.com format, the JSON response will contain an error instead.</li>
+          <li>When I visit that shortened URL, it will redirect me to my original link.</li>
+      </ol>
+    </div>
   </body>
 </html>
 
