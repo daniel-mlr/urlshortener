@@ -1,3 +1,5 @@
+'use strict'
+
 // setup requirements and instantiations
 const express = require('express')
 const app = express()
@@ -5,6 +7,9 @@ const cors = require('cors')
 // const mongoose = require('mongoose')
 const mongo = require('mongodb').MongoClient
 const bodyParser = require('body-parser')
+
+// delegate routing
+var routes = require('./app/routes/index.js')
 
 
 // Connect to the database
@@ -23,23 +28,21 @@ mongo.connect('mongodb://localhost:27017/urldb', (err, db) => {
     app.use(express.static(__dirname + '/public'))
     app.use('/controllers', express.static(__dirname + '/app/controllers'))
 
-    // Create the database entry (asterix: accept whole string 
-    // regardless of chars.)
-    app.get('/new/:url_to_shorten(*)', (req, res) => {
-        var { url_to_shorten } = req.params;
-        console.log(url_to_shorten);
-        res.send('bonjour: ' + url_to_shorten )
-    })
+    // process app and database objects
+    routes(app, db)
 
     // catch all other urls
-    app.get('*', (req, res) => res.send('This page doesn\'t exist'))
+    app.get('*', (req, res) => res.json({
+        "error": "no short url found for given input" }))
+
+    
+    // monitor server
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => console.log(`server listening on port ${PORT}`))
 
 })
 
 
-// monitor server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`server listening on port ${PORT}`))
 
 
 
