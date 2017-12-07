@@ -1,4 +1,11 @@
 'use strict'
+// const validUrl = require('valid-url')
+
+// import not supported in node
+// import isURL from 'validator/lib/isURL'
+
+// var validator = require('validator')
+const isURL = require('validator/lib/isURL')
 
 module.exports = function(app, db) {
     app.route('/').get((req, res) => {
@@ -22,8 +29,21 @@ module.exports = function(app, db) {
     // Route via GET (asterix: accept whole string regardless of chars.)
     app.route('/new/:url_to_shorten(*)').get( (req, res) => {
         var { url_to_shorten } = req.params;
+        
+        // if (validUrl.isWebUri(url_to_shorten)) {
+        //     res.send('cet uri semble correct. ' + url_to_shorten)
+        // } else {
+        //     res.send(url_to_shorten + ' n\'est pas correct')
+        // }
+        if (isURL(url_to_shorten, {protocols: ['http', 'https'] })) {
+            res.send('cet uri semble correct. ' + url_to_shorten)
+        } else {
+            res.send(url_to_shorten + ' n\'est pas correct')
+        }
+        
 
         // prepend the protocol http if not present       
+        /*
         var protocol = new RegExp('^(https?:\/\/)');
         if (!protocol.test(url_to_shorten)) {
             url_to_shorten = 'http://' + url_to_shorten
@@ -38,15 +58,14 @@ module.exports = function(app, db) {
             res.send(url_to_shorten + ' est valide' )
             
             // creation and update of database
-            /*
-            db.collection('usedURL').save(url_to_shorten,  (err, result) => {
-                if (err) return console.log(err)
-            })
-            */
+            // db.collection('usedURL').save(url_to_shorten,  (err, result) => {
+            //     if (err) return console.log(err)
+            // })
         
         } else {
             res.send(url_to_shorten + ' n\'est PAS valide')
         }
+        */
 
         console.log(url_to_shorten);
         
