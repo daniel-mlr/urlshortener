@@ -14,14 +14,15 @@
     <img class="img-responsive" 
     src="http://res.cloudinary.com/danielmeilleurimg/fcc_backend/etau.png" alt="vice crashing url">
     <div>
-        <form>
+        <!--form action="/new" method="POST" enctype="application/json"-->
+        <form action="/new" method="POST">
+            <label for="urlIn">Enter URL to shorten</label>
+            <input type="text" id="urlIn" name="url_to_shorten">
+          <button type="submit">Submit</button>
         </form>
-        Enter URL to shorten
-        <input type="text" name="url_to_shorten">
         <br>
     </div>
     <div>
-      <button type="button">Enter</button>
       <strong>Note:</strong> You can also enter the URL to shorten in the address bar as follow: {{ req.hostname }}/new/http://address.com
     </div>
     <div>
@@ -33,6 +34,10 @@
           <li>When I visit that shortened URL, it will redirect me to my original link.</li>
       </ol>
     </div>
+    <p id="testscript"></p>
+    <script type="text/javascript" 
+        src="/controllers/mainControllerClient.js">
+    </script>
   </body>
 </html>
 

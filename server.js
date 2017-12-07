@@ -21,7 +21,8 @@ mongo.connect('mongodb://localhost:27017/urldb', (err, db) => {
     }
 
     // parse body of requests and allow cross-origin ressource sharing
-    app.use(bodyParser.json());
+    // app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({extended: false}));
     app.use(cors())
     
     // access to static files in public directory
