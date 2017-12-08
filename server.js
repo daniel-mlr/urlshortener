@@ -7,10 +7,8 @@ const cors = require('cors')
 // const mongoose = require('mongoose')
 const mongo = require('mongodb').MongoClient
 const bodyParser = require('body-parser')
-
 // delegate routing
 var routes = require('./app/routes/index.js')
-
 
 // Connect to the database
 mongo.connect('mongodb://localhost:27017/urldb', (err, db) => {
@@ -22,8 +20,8 @@ mongo.connect('mongodb://localhost:27017/urldb', (err, db) => {
 
     // parse body of requests and allow cross-origin ressource sharing
     // app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({extended: false}));
-    app.use(cors())
+    app.use(bodyParser.urlencoded({extended: true}));
+    // app.use(cors())
     
     // access to static files in public directory
     app.use(express.static(__dirname + '/public'))
@@ -31,11 +29,7 @@ mongo.connect('mongodb://localhost:27017/urldb', (err, db) => {
 
     // process app and database objects
     routes(app, db)
-
-    // catch all other urls
-    app.get('*', (req, res) => res.json({
-        "error": "no short url found for given input" }))
-
+    // db.close()
     
     // monitor server
     const PORT = process.env.PORT || 3000;

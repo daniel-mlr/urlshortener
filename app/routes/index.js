@@ -1,19 +1,84 @@
 'use strict'
-// const validUrl = require('valid-url')
-
-// import not supported in node
-// import isURL from 'validator/lib/isURL'
-
-// var validator = require('validator')
-const isURL = require('validator/lib/isURL')
 
 module.exports = function(app, db) {
+    // note: some google chrome extensions cause 
+    // the get request to be sent twice!
+
+    const isURL = require('validator/lib/isURL');
+    const util = require('util');
+
+    // root: call home page
     app.route('/').get((req, res) => {
         res.sendFile(process.cwd() + '/public/index.html')
     })
     
-    // Create the database entry 
+    
+    // create and/or access the collection
+    var urlcoll = db.collection('urlcoll');
 
+    // Route via GET (asterix: accept whole string regardless of chars.)
+    app.route('/new/:url_to_shorten(*)').get( (req, res) => {
+        var { url_to_shorten } = req.params;
+       
+
+        console.log('url soumis par GET: ' + url_to_shorten);
+        console.log('req.params dans index.js): ' + JSON.stringify(req.query))
+        
+        if (isURL(url_to_shorten, {protocols: ['http', 'https'] })) {
+            console.log('de GET: cet uri semble correct. ' + url_to_shorten);
+
+            
+            // url query parameters have been stripped; put them back
+            if (!isEmpty(req.query)) {
+                console.log('req.query ne devrait pas être vide. ' + 
+                        JSON.stringify(req.params))
+                url_to_shorten += '?' + JSON.stringify(req.query)
+                    .replace(/:/g, '=').replace(/["{}]/g, '').replace(/,/g, '&')
+            }
+           
+            // put back the http protocol if not there
+            if (!url_to_shorten.startsWith('http')) {
+                url_to_shorten = 'http://' + url_to_shorten
+            }
+
+            // find url_to_shorten, if not exists, create it
+            urlcoll.findOne({'longurl': url_to_shorten}, {}, (err, doc) => {
+                if (err) return console.log(err);
+                console.log('inspection: ' + util.inspect(doc));
+
+                if (doc !== null) {
+                    // url_to_shorten existe, 
+                    res.send('urllong existant: ' + doc.longurl + 
+                            ',  racourci: ' + doc.shorturl);
+                } else { 
+
+                    urlcoll.find({}, {'shorturl':1, _id:0})
+                        .limit(1).sort({$natural: -1}).next( (err, doc) => {
+                            if (err) console.log(err);
+                            console.log('methode next: ' + doc.shorturl)
+
+                            // generate a new short from the last one used
+                            var new_short = makeShortUrl(doc.shorturl)
+                            urlcoll.insert({
+                                'longurl': url_to_shorten, 
+                                'shorturl': new_short
+                            }, (err, doc) => {
+                                if (err) return console.log(err);
+                                console.log('insertion réussie');
+                                res.send('nouveau urllong: ' + url_to_shorten + 
+                                        ', nouveau racourci: ' + new_short);
+
+                            })
+                    })
+                }
+            })
+
+        } else {
+            res.send('de GET: ' + url_to_shorten + ' n\'est pas correct')
+        }
+
+    })
+    
     // Route via POST
     app.route('/new/').post((req, res) => {
         // traitement de post
@@ -21,53 +86,38 @@ module.exports = function(app, db) {
         console.log(req.body);
         var { url_to_shorten } = req.body
 
-        res.send('url de post: ' + url_to_shorten)
-            
-    })
-
-
-    // Route via GET (asterix: accept whole string regardless of chars.)
-    app.route('/new/:url_to_shorten(*)').get( (req, res) => {
-        var { url_to_shorten } = req.params;
-        
-        // if (validUrl.isWebUri(url_to_shorten)) {
-        //     res.send('cet uri semble correct. ' + url_to_shorten)
-        // } else {
-        //     res.send(url_to_shorten + ' n\'est pas correct')
-        // }
+        // res.send('url de post: ' + url_to_shorten)
         if (isURL(url_to_shorten, {protocols: ['http', 'https'] })) {
             res.send('cet uri semble correct. ' + url_to_shorten)
         } else {
             res.send(url_to_shorten + ' n\'est pas correct')
         }
-        
 
-        // prepend the protocol http if not present       
-        /*
-        var protocol = new RegExp('^(https?:\/\/)');
-        if (!protocol.test(url_to_shorten)) {
-            url_to_shorten = 'http://' + url_to_shorten
-        }
-
-        var url_syntax = /^(https?:\/\/)?(www\.)?[a-zA-Z0-9]{1}([a-zA-Z0-9.]){0,256}\.(com|org|net|edu|gov|int|mil|arpa|[a-z]{2})$/
-        
-        var adjacent_dots = /\.\./
-        if (!url_to_shorten.match(adjacent_dots) && 
-            url_syntax.test(url_to_shorten) ) {
-            // no adjacents dots and syntax ok
-            res.send(url_to_shorten + ' est valide' )
+        console.log(req.query);
             
-            // creation and update of database
-            // db.collection('usedURL').save(url_to_shorten,  (err, result) => {
-            //     if (err) return console.log(err)
-            // })
-        
-        } else {
-            res.send(url_to_shorten + ' n\'est PAS valide')
-        }
-        */
-
-        console.log(url_to_shorten);
-        
     })
+
+    // catch all other urls
+    app.get('*', (req, res) => {
+        console.log('get asterisque');
+        res.json({"error": "no short url found for given input" })
+    })
+
+    function makeShortUrl(lastShortUrl) {
+        // return lastShortUrl + 1
+        return (parseInt(lastShortUrl, 36) + 1).toString(36)
+    }
+
+    // function isEmpty(obj) {
+    //     for(var key in obj) {
+    //         if(obj.hasOwnProperty(key))
+    //             return false;
+    //     }
+    //     return true;
+    // }
+
+    function isEmpty(obj) {
+        return Object.keys(obj).length === 0;
+    }
+
 }
