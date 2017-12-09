@@ -21,11 +21,10 @@ function urlHandler(db) {
         }
         
         if (validUrl(url_to_shorten)) {
-            shortenURL(req, res, url_to_shorten)
+            shortenURL(req, res)
         } else {
             res.json({"error": url_to_shorten + "is not a valid url"})
         }
-        
     }
     
     this.urlServicePost = function(req, res){
@@ -51,7 +50,7 @@ function urlHandler(db) {
         }
     
         urlcoll.findOne({'longurl': url_to_shorten}, {}, (err, doc) => {
-            if (err) return console.log(err);
+            if (err) return console.err('error in shortenURL' + err);
             
             if (doc !== null) {
                 // url_to_shorten exists already in the collection
@@ -65,7 +64,7 @@ function urlHandler(db) {
                     .limit(1).sort({$natural: -1}).next( (err, doc) => {
                         if (err) console.error('err in insertNewUrl ' + err);
                         // generate a new short from the last one used
-                        var new_short = makeShortUrl(doc.shorturl)
+                        var new_short = makeShortUrl(doc.shorturl);
                             // and create a new document in the db
                             urlcoll.insert({
                                 'longurl': url_to_shorten, 
@@ -81,6 +80,17 @@ function urlHandler(db) {
         })
     }
 
+    
+    /*
+    }, writeResult
+    
+    function writeResult(err, doc) {
+        if (err) return console.error(err);
+        res.send('nouveau urllong: ' + url_to_shorten + 
+                ', nouveau racourci: ' + new_short);
+    }
+    */
+   
     /*
     function insertNewUrl(err, doc) {
         if (err) console.error('err in insertNewUrl ' + err);
