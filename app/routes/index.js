@@ -1,9 +1,27 @@
 'use strict'
+/*
+*/
+
+var UrlHandler = require(
+        process.cwd() + '/app/controllers/urlHandler.server.js'
+    );
 
 module.exports = function(app, db) {
     // note: some google chrome extensions cause 
     // the get request to be sent twice!
 
+    var urlHandler = new UrlHandler(db)
+    
+    app.route('/').get((req, res) => {
+        res.sendFile(process.cwd() + '/public/index.html')
+    })
+    
+    app.route('/new/:url_to_shorten(*)').get(urlHandler.urlServiceGet)
+
+}
+
+    /*
+   
     const isURL = require('validator/lib/isURL');
     const util = require('util');
 
@@ -20,13 +38,13 @@ module.exports = function(app, db) {
     app.route('/new/:url_to_shorten(*)').get( (req, res) => {
         var { url_to_shorten } = req.params;
        
-
         console.log('url soumis par GET: ' + url_to_shorten);
         console.log('req.params dans index.js): ' + JSON.stringify(req.query))
         
         if (isURL(url_to_shorten, {protocols: ['http', 'https'] })) {
-            console.log('de GET: cet uri semble correct. ' + url_to_shorten);
-
+            // this is a well formed url
+            
+            // console.log('de GET: cet uri semble correct. ' + url_to_shorten);
             
             // url query parameters have been stripped; put them back
             if (!isEmpty(req.query)) {
@@ -44,39 +62,38 @@ module.exports = function(app, db) {
             // find url_to_shorten, if not exists, create it
             urlcoll.findOne({'longurl': url_to_shorten}, {}, (err, doc) => {
                 if (err) return console.log(err);
-                console.log('inspection: ' + util.inspect(doc));
-
                 if (doc !== null) {
-                    // url_to_shorten existe, 
+                    // url_to_shorten exists already in the db
                     res.send('urllong existant: ' + doc.longurl + 
                             ',  racourci: ' + doc.shorturl);
                 } else { 
-
+                    // url_to_shorten doesn't exist yet
+                    // we get the last shorturl name entered 
+                    // from which we will generate a new one
                     urlcoll.find({}, {'shorturl':1, _id:0})
-                        .limit(1).sort({$natural: -1}).next( (err, doc) => {
-                            if (err) console.log(err);
-                            console.log('methode next: ' + doc.shorturl)
-
+                        // .limit(1).sort({$natural: -1}).next( (err, doc) => {
+                        .limit(1).sort({$natural: -1})
+                        .next(function insertNewUrl(err, doc){
+                            if (err) console.error('err in insertNewUrl ' + err);
                             // generate a new short from the last one used
                             var new_short = makeShortUrl(doc.shorturl)
-                            urlcoll.insert({
-                                'longurl': url_to_shorten, 
-                                'shorturl': new_short
-                            }, (err, doc) => {
-                                if (err) return console.log(err);
-                                console.log('insertion réussie');
-                                res.send('nouveau urllong: ' + url_to_shorten + 
-                                        ', nouveau racourci: ' + new_short);
-
-                            })
+                                // and create a new document in the db
+                                urlcoll.insert({
+                                    'longurl': url_to_shorten, 
+                                    'shorturl': new_short
+                                }, (err, doc) => {
+                                    if (err) return console.log(err);
+                                    res.send('nouveau urllong: ' + url_to_shorten + 
+                                            ', nouveau racourci: ' + new_short);
+                                })
                     })
                 }
             })
 
         } else {
+            // not a well formed url
             res.send('de GET: ' + url_to_shorten + ' n\'est pas correct')
         }
-
     })
     
     // Route via POST
@@ -108,16 +125,9 @@ module.exports = function(app, db) {
         return (parseInt(lastShortUrl, 36) + 1).toString(36)
     }
 
-    // function isEmpty(obj) {
-    //     for(var key in obj) {
-    //         if(obj.hasOwnProperty(key))
-    //             return false;
-    //     }
-    //     return true;
-    // }
-
     function isEmpty(obj) {
         return Object.keys(obj).length === 0;
     }
 
 }
+*/

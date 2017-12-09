@@ -36,14 +36,3 @@ mongo.connect('mongodb://localhost:27017/urldb', (err, db) => {
     app.listen(PORT, () => console.log(`server listening on port ${PORT}`))
 
 })
-
-
-
-
-
-/*
-app.post('/new', (req, res) => {
-    console.log('méthode d\'envoi par post')
-    res.send('test pour post: ' )
-})
-*/
