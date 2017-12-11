@@ -57,3 +57,12 @@ typings/
 # dotenv environment variables file
 .env
 
+# binary files
+*.jpg
+*.ico
+*.gif
+*.pdf
+*.png
+
+# data
+data/*
