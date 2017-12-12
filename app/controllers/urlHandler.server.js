@@ -3,6 +3,7 @@ function urlHandler(db) {
     /* jshint validthis:true */
     
     const isURL = require('validator/lib/isURL');
+    const util = require('util')
 
     var url_to_shorten;
 
@@ -21,7 +22,6 @@ function urlHandler(db) {
         req.body.url_to_shorten = url_to_shorten;
 
         next()
-
     }
     
     this.validate = function(req, res, next){
@@ -56,52 +56,55 @@ function urlHandler(db) {
             
             if (doc !== null) {
                 // url_to_shorten exists already in the collection
-                res.send('urllong existant: ' + doc.longurl + 
-                        ',  racourci: ' + doc.shorturl);
+                console.log('new url_to_shorten: ' + url_to_shorten + 'short: ' + doc.shorturl);
+                res.json({"original_url":doc.longurl,"short_url":doc.shorturl});
             } else { 
-                // url_to_shorten doesn't exist yet. So we get the last shorturl
-                // in the db, from which we will generate a new one
+                // url_to_shorten doesn't exist yet. Next middleware will create it.
                 next()
-                
-                // urlcoll.find({}, {'shorturl':1, _id:0}).limit(1)
-                //     .sort({$natural: -1}).next( (err, doc) => {
-                //         if (err) console.error('err in insertNewUrl ' + err);
-                //         // generate a new short from the last one used
-                //         var new_short = makeShortUrl(doc.shorturl);
-                //             // and create a new document in the db
-                //             urlcoll.insert({
-                //                 'longurl': url_to_shorten, 
-                //                 'shorturl': new_short
-                //             }, (err, doc) => {
-                //                 if (err) return console.log(err);
-                //                 res.send('nouveau urllong: ' + url_to_shorten + 
-                //                         ', nouveau racourci: ' + new_short);
-                //             })
-                //     })
             }
         })
     }
 
     this.createNewShort = function(req, res) {
-        // var urlcoll = req.urlcoll;
+        // Get the last shorturl from the collection and generate a new one.
 
         req.urlcoll.find({}, {'shorturl':1, _id:0}).limit(1)
             .sort({$natural: -1}).next( (err, doc) => {
                 if (err) console.error('err in insertNewUrl ' + err);
                 // generate a new short from the last one used
-                var new_short = makeShortUrl(doc.shorturl);
-                // and create a new document in the db
+                var new_short;
+                if (doc) {
+                    new_short = makeShortUrl(doc.shorturl);
+                } else {
+                    // (only in case there is no entry in the collection yet)
+                    new_short = 'aa'
+                }
+                // and create a new document in the collection
                 req.urlcoll.insert({
                     'longurl': url_to_shorten, 
                     'shorturl': new_short
                 }, (err, doc) => {
                     if (err) return console.log(err);
-                    res.send('nouveau urllong: ' + url_to_shorten + 
-                            ', nouveau racourci: ' + new_short);
+                    console.log('new url_to_shorten: ' + url_to_shorten + 'short: ' + new_short);
+                    res.json({"original_url":url_to_shorten,"short_url":new_short});
                 })
             })
     }
 
+    this.useShort = function(req, res) {
+        var urlcoll = db.collection('urlcoll');
+        urlcoll.findOne({shorturl: req.params.shorturl}, (err, doc) => {
+            if (err) console.error('err in useShort ' + err);
+            console.log('doc est: ' + util.inspect(doc))
+            if (doc) {
+                console.log('shorturl: ' + doc.shorturl +'redirects to: ' + doc.longurl);
+                // we have a match for shorturl
+                res.redirect(doc.longurl)
+            } else {
+                res.json({'error': 'this url is not in the database'})
+            }
+        })
+    }
     
     function isEmpty(obj) {
         return Object.keys(obj).length === 0;

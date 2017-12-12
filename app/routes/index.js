@@ -8,24 +8,15 @@ module.exports = function(app, db) {
 
     var urlHandler = new UrlHandler(db)
    
+    // group url handlers apps in a list
     var {validate, shortenURL, createNewShort} = urlHandler
     var processURL = [validate, shortenURL, createNewShort]
 
-    // app.route('/').get((req, res) => {
-    //     res.sendFile(process.cwd() + '/public/index.html')
-    // }).post(urlHandler.validate, urlHandler.shortenURL)
-    
     app.route('/').get((req, res) => {
         res.sendFile(process.cwd() + '/public/index.html')
     }).post(processURL)
-
-    // app.route('/new/:url_to_shorten(*)')
-    //     .get(urlHandler.urlServiceGet, urlHandler.validate, urlHandler.shortenURL)
     
     app.route('/new/:url_to_shorten(*)').get(urlHandler.urlServiceGet, [processURL])
-
-    app.route('*').get((req, res)=> {
-        res.end('invalide')
-    })
-        
+    app.route('/:shorturl').get(urlHandler.useShort)
+    app.route('*').get((req, res) => {res.status(404).end('404 - page not found')})
 }
