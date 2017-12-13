@@ -13,12 +13,12 @@ var routes = require('./app/routes/index.js')
 // Connect to the database
 
 const connection = 'mongodb://localhost:27017/urldb'
-// mongo.connect('mongodb://localhost:27017/urldb', (err, db) => {
-mongo.connect(process.env.MONGOLAB_URI || connection, (err, db) => {
+// mongo.connect(process.env.MONGOLAB_URI || connection, (err, db) => {
+mongo.connect(process.env.MONGODB_URI || connection, (err, db) => {
     if (err) {
-        throw new Error('Database failed to connect')
+        throw new Error(err + '  Database failed to connect')
     } else {
-        console.log('MongoDB successfully connect on port 27017')
+        console.log('MongoDB successfully connected')
     }
 
     // parse body of requests and allow cross-origin ressource sharing
