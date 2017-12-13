@@ -11,7 +11,10 @@ const bodyParser = require('body-parser')
 var routes = require('./app/routes/index.js')
 
 // Connect to the database
-mongo.connect('mongodb://localhost:27017/urldb', (err, db) => {
+
+const connection = 'mongodb://localhost:27017/urldb'
+// mongo.connect('mongodb://localhost:27017/urldb', (err, db) => {
+mongo.connect(process.env.MONGOLAB_URI || connection, (err, db) => {
     if (err) {
         throw new Error('Database failed to connect')
     } else {
@@ -19,7 +22,6 @@ mongo.connect('mongodb://localhost:27017/urldb', (err, db) => {
     }
 
     // parse body of requests and allow cross-origin ressource sharing
-    // app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: true}));
     // app.use(cors())
     

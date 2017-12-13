@@ -77,7 +77,7 @@ function urlHandler(db) {
                     new_short = makeShortUrl(doc.shorturl);
                 } else {
                     // (only in case there is no entry in the collection yet)
-                    new_short = 'aa'
+                    new_short = 'a'
                 }
                 // and create a new document in the collection
                 req.urlcoll.insert({
@@ -92,13 +92,14 @@ function urlHandler(db) {
     }
 
     this.useShort = function(req, res) {
+        // make a db connection and search the given shorturl
         var urlcoll = db.collection('urlcoll');
         urlcoll.findOne({shorturl: req.params.shorturl}, (err, doc) => {
             if (err) console.error('err in useShort ' + err);
-            console.log('doc est: ' + util.inspect(doc))
+            // console.log('doc est: ' + util.inspect(doc))
             if (doc) {
-                console.log('shorturl: ' + doc.shorturl +'redirects to: ' + doc.longurl);
                 // we have a match for shorturl
+                console.log('shorturl: ' + doc.shorturl +'redirects to: ' + doc.longurl);
                 res.redirect(doc.longurl)
             } else {
                 res.json({'error': 'this url is not in the database'})
