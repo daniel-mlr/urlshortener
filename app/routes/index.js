@@ -12,11 +12,10 @@ module.exports = function(app, db) {
     var {validate, shortenURL, createNewShort} = urlHandler
     var processURL = [validate, shortenURL, createNewShort]
 
+    // define and assign middleware processes to routes
     app.route('/').get((req, res) => {
         res.sendFile(process.cwd() + '/public/index.html')
     }).post(processURL)
-    
-    // app.route('/new/:url_to_shorten(*)').get(urlHandler.urlServiceGet, [processURL])
     app.route('/new/:url_to_shorten(*)').get(urlHandler.urlServiceGet, processURL)
     app.route('/:shorturl').get(urlHandler.useShort)
     app.route('*').get((req, res) => {res.status(404).end('404 - page not found')})

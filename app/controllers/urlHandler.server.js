@@ -3,8 +3,6 @@ function urlHandler(db) {
     /* jshint validthis:true */
     
     const isURL = require('validator/lib/isURL');
-    const util = require('util')
-
     var url_to_shorten;
 
     this.urlServiceGet = function(req, res, next){
@@ -29,9 +27,7 @@ function urlHandler(db) {
         
         url_to_shorten = req.body.url_to_shorten;
         
-        console.log('url_to_shorten validé: ' + url_to_shorten)
-
-        // options for isURL: we want check only http(s) protocol
+        // options for isURL: we want only http(s) protocol
         var isurl_options = {protocols:  ['http', 'https'] }
         if (!isURL(url_to_shorten, isurl_options)) {
             res.json({"error": url_to_shorten + " is not a valid url"})
@@ -42,6 +38,7 @@ function urlHandler(db) {
     }
        
     this.shortenURL = function(req, res, next) {
+        // if longurl exists, use its abbreviation. Else, call next middleware.
     
         // create and/or access the collection; attach it to req for further use
         req.urlcoll = db.collection('urlcoll');
@@ -55,8 +52,7 @@ function urlHandler(db) {
             if (err) return console.err('error in shortenURL' + err);
             
             if (doc !== null) {
-                // url_to_shorten exists already in the collection
-                console.log('new url_to_shorten: ' + url_to_shorten + 'short: ' + doc.shorturl);
+                // url_to_shorten is already in the collection
                 res.json({"original_url":doc.longurl,"short_url":doc.shorturl});
             } else { 
                 // url_to_shorten doesn't exist yet. Next middleware will create it.
@@ -71,7 +67,7 @@ function urlHandler(db) {
         req.urlcoll.find({}, {'shorturl':1, _id:0}).limit(1)
             .sort({$natural: -1}).next( (err, doc) => {
                 if (err) console.error('err in insertNewUrl ' + err);
-                // generate a new short from the last one used
+                // generate a new short from the last one used ...
                 var new_short;
                 if (doc) {
                     new_short = makeShortUrl(doc.shorturl);
@@ -79,13 +75,12 @@ function urlHandler(db) {
                     // (only in case there is no entry in the collection yet)
                     new_short = 'a'
                 }
-                // and create a new document in the collection
+                // ... and create a new document in the collection
                 req.urlcoll.insert({
                     'longurl': url_to_shorten, 
                     'shorturl': new_short
                 }, (err, doc) => {
                     if (err) return console.log(err);
-                    console.log('new url_to_shorten: ' + url_to_shorten + 'short: ' + new_short);
                     res.json({"original_url":url_to_shorten,"short_url":new_short});
                 })
             })
@@ -96,12 +91,11 @@ function urlHandler(db) {
         var urlcoll = db.collection('urlcoll');
         urlcoll.findOne({shorturl: req.params.shorturl}, (err, doc) => {
             if (err) console.error('err in useShort ' + err);
-            // console.log('doc est: ' + util.inspect(doc))
             if (doc) {
                 // we have a match for shorturl
-                console.log('shorturl: ' + doc.shorturl +'redirects to: ' + doc.longurl);
                 res.redirect(doc.longurl)
             } else {
+                // no match found
                 res.json({'error': 'this url is not in the database'})
             }
         })
@@ -112,7 +106,7 @@ function urlHandler(db) {
     }
     
     function makeShortUrl(lastShortUrl) {
-        // return lastShortUrl + 1
+        // return lastShortUrl + 1. Base 36 make use of whole alphabet and digits
         return (parseInt(lastShortUrl, 36) + 1).toString(36)
     }
 }

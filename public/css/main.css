@@ -1,10 +1,16 @@
-.code-container {
-    margin-bottom: 20px;
+/************************/
+/*   LAYOUT             */
+/************************/
+
+small {
+  font-size: 70%;
 }
-.ajout {display: block}
+
+
+
+/*
 ol {
     counter-reset: list;
-    /*background-color: yellow;*/
 }
 ol > li {
     list-style: none;
@@ -19,3 +25,10 @@ ol > li:before {
     position: absolute;
     left: -1.43em;
 }
+
+@media screen and (max-width: 600px) {
+  #vice {
+    display: none;
+  }
+}
+*/

@@ -3,36 +3,50 @@
   <head>
     <meta charset="utf-8" />
     <title>FCC URL Shortenre</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="insert content">
+    <!-- 
+    <link rel="stylesheet" type="text/css" href="/css/furtive.min.css">
+    link rel="stylesheet" type="text/css" href="/css/index.furtive.min.css"
+    -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/furtive/2.3.0/furtive.min.css">
     <link rel="stylesheet" type="text/css" href="/css/main.css">
   </head>
   <body>
-    <header>
-      <h1><small>FreeCodeCamp APi Basejump</small> URL Shortener</h1>
-    </header>
-    <img class="img-responsive" src="http://res.cloudinary.com/danielmeilleurimg/fcc_backend/etaug.jpg" alt="vice crashing url">
-    <div>
-        <!--form action="/new" method="POST" enctype="application/json"-->
-        <form action="/" method="POST">
+    
+    <div class="grd bg--white p1">
+      <header>
+        <h1><small>FreeCodeCamp API Basejump</small> URL&nbsp;Shortener</h1>
+      </header>
+      <div class="grd-row">
+        <div class="grd-row-col-2-6--md">
+            <img "flt--right" src="http://res.cloudinary.com/danielmeilleurimg/image/upload/v1513214527/fcc_backend/etaug.jpg" alt="vice crashing url">
+        </div>
+        <div class="grd-row-col-4-6--md">
+          <form action="/" method="POST">
             <label for="urlIn">Enter URL to shorten</label>
-            <input type="text" id="urlIn" name="url_to_shorten">
-          <button type="submit">Submit</button>
-        </form>
-        <br>
+            <input type="text" id="urlIn" class="smooth" name="url_to_shorten">
+            <button class="btn--blue" type="submit">Submit</button>
+          </form>
+          <strong>Note:</strong> You can also enter the URL to shorten in your browser address bar as follow: 
+          <code> http://urlshortenerdm.herokuapp.com/new/http://address.com</code>
+        </div>
+      </div>
     </div>
-    <div>
-      <strong>Note:</strong> You can also enter the URL to shorten in the address bar as follow: {{ req.hostname }}/new/http://address.com
-    </div>
-    <div>
-      <p>This is part of the requirements for the <a href="http://www.freecodecamp.org">Free Code Camp</a> Backend Development Certificate</p>
-      <h4>User stories:</h4>
-      <ol>
+  
+ 
+    <div class="grd bg--light-gray p1">
+      <div>
+        <p>This is part of the requirements for the <a href="http://www.freecodecamp.org">Free Code Camp</a> Backend Development Certificate</p>
+        <h4>User stories:</h4>
+        <ol>
           <li>I can pass a URL as a parameter and I will receive a shortened URL in the JSON response.</li>
           <li>If I pass an invalid URL that doesn't follow the valid http://www.example.com format, the JSON response will contain an error instead.</li>
           <li>When I visit that shortened URL, it will redirect me to my original link.</li>
-      </ol>
+        </ol>
+      </div>
     </div>
+
     <p id="testscript"></p>
     <script type="text/javascript" 
         src="/controllers/mainControllerClient.js">
