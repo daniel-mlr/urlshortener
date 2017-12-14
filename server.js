@@ -12,12 +12,13 @@ var routes = require('./app/routes/index.js')
 
 const connection = 'mongodb://localhost:27017/urldb'
 // mongo.connect(process.env.MONGOLAB_URI || connection, (err, db) => { doesnt work
-mongo.connect(process.env.MONGODB_URI || connection, (err, db) => {
+mongo.connect(process.env.MONGODB_URI || connection, (err, database) => {
     if (err) {
         throw new Error(err + '  Database failed to connect')
     } else {
         console.log('MongoDB successfully connected')
     }
+    const db = database.db('urldb')
 
     // parse body of requests 
     app.use(bodyParser.urlencoded({extended: true}));
