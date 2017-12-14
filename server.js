@@ -18,7 +18,8 @@ mongo.connect(process.env.MONGODB_URI || connection, (err, database) => {
     } else {
         console.log('MongoDB successfully connected')
     }
-    const db = database.db('urldb')
+    // const db = database.db('urldb')
+    const db = database.db('heroku_p5h4xc1m')
 
     // parse body of requests 
     app.use(bodyParser.urlencoded({extended: true}));
