@@ -49,7 +49,7 @@ function urlHandler(db) {
         }
     
         req.urlcoll.findOne({'longurl': url_to_shorten}, {}, (err, doc) => {
-            if (err) return console.err('error in shortenURL' + err);
+            if (err) return console.error('error in shortenURL' + err);
             
             if (doc !== null) {
                 // url_to_shorten is already in the collection
